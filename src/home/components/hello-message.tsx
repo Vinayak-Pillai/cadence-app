@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text } from "react-native";
 import { helloMessageStyles } from "@home/styling/hello-message-styles";
-import { useTheme } from "@/shared/components/theme-context";
+import { useThemeStyles } from "@/shared/hooks/use-theme-styles";
 
 export interface HelloMessageProps {
   name?: string;
@@ -10,8 +10,8 @@ export interface HelloMessageProps {
 export const HelloMessage: React.FC<HelloMessageProps> = ({
   name = "there",
 }) => {
-  const { colors } = useTheme();
-  const styles = helloMessageStyles(colors);
+  const styles = useThemeStyles(helloMessageStyles);
+
   return (
     <View style={styles.card}>
       <View style={styles.badge}>

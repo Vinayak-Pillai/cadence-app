@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 import { ColorPalette, theme } from "@shared/styling/theme";
 
-export const headerStyles = (colors: ColorPalette, insetsTop: number = 0) => {
+export const headerStyles = (colors: ColorPalette) => {
   return StyleSheet.create({
     container: {
       width: "100%",

@@ -2,12 +2,13 @@ import {
   createContext,
   FC,
   ReactNode,
+  useCallback,
   useContext,
   useMemo,
   useState,
 } from "react";
-import { ColorPalette, darkColors, lightColors, theme } from "../styling/theme";
 import { useColorScheme } from "react-native";
+import { ColorPalette, darkColors, lightColors } from "@shared/styling/theme";
 
 export type ThemeMode = "light" | "dark";
 
@@ -23,29 +24,35 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 export const ThemeProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const systemColorScheme = useColorScheme();
-  const [theme, setTheme] = useState<ThemeMode>(
-    systemColorScheme === "dark" ? "dark" : "light",
-  );
+  const [manualTheme, setManualTheme] = useState<ThemeMode | null>(null);
 
-  const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
-  };
+  const activeTheme: ThemeMode =
+    manualTheme ?? (systemColorScheme === "dark" ? "dark" : "light");
+
+  const toggleTheme = useCallback(() => {
+    setManualTheme(activeTheme === "light" ? "dark" : "light");
+  }, [activeTheme]);
+
+  const setTheme = useCallback((newTheme: ThemeMode) => {
+    setManualTheme(newTheme);
+  }, []);
 
   const colors = useMemo(
-    () => (theme === "dark" ? darkColors : lightColors),
-    [theme],
+    () => (activeTheme === "dark" ? darkColors : lightColors),
+    [activeTheme],
   );
-  const isDark = theme === "dark";
+
+  const isDark = activeTheme === "dark";
 
   const value = useMemo(
     () => ({
-      theme,
+      theme: activeTheme,
       colors,
       isDark,
       toggleTheme,
       setTheme,
     }),
-    [theme, colors, isDark],
+    [activeTheme, colors, isDark, toggleTheme, setTheme],
   );
 
   return (
@@ -55,7 +62,8 @@ export const ThemeProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
 export const useTheme = (): ThemeContextValue => {
   const context = useContext(ThemeContext);
-  if (context === undefined)
+  if (context === undefined) {
     throw new Error("useTheme must be used within a ThemeProvider");
+  }
   return context;
 };
